@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 日志级别从低到高分为TRACE < DEBUG < INFO < WARN < ERROR < FATAL，如果设置为WARN，则低于WARN的信息都不会输出 -->
+<!-- scan:当此属性设置为true时，配置文档如果发生改变，将会被重新加载，默认值为true -->
+<!-- scanPeriod:设置监测配置文档是否有修改的时间间隔，如果没有给出时间单位，默认单位是毫秒。
+                 当scan为true时，此属性生效。默认的时间间隔为1分钟。 -->
+<!-- debug:当此属性设置为true时，将打印出logback内部日志信息，实时查看logback运行状态。默认值为false。 -->
+<configuration scan="true" scanPeriod="30 seconds" debug="false">
+    <!--include可以引入其它配置文件，这里引入了logback内置配置，包括一个名为CONSOLE的appender-->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml" />
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
+    <!--property属性值定义 name的值是变量的名称，value的值时变量定义的值。通过定义的值会被插入到logger上下文中。定义后，可以使“${}”来使用变量。 -->
+    <!--${LOG_FILE}会主动访问application.yml中定义的loggging.file.name 其它变量参阅https://docs.spring.io/spring-boot/docs/current/reference/html/howto.html#howto.logging.logback-->
+    <!-- 可以通过这种方式随不同的application.yml更改不同运行状态下的日志输出方式 -->
+    <property name="LOG_FILE" value="${LOG_FILE}" />
+
+    <!--1个appender对应1种打印配置,name可根据需要添加,class基本只有Console和RollingFile两种-->
+    <!--1. 输出到控制台-->
+    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <!--这里定义appender的日志输出格式,准备输出到console,所以等价于logging.pattern.console-->
+            <pattern>%d{HH:mm:ss.SSS} [%t] %-5level %logger{36}:%L - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!--2. 输出到文件-->
+    <appender name="RollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 输出文件的路径-->
+        <file>tmp/logs/app.log</file>
+        <encoder>
+            <!-- %d{HH:mm:ss.SSS} %-5level %logger{36} [%line] - %msg%n-->
+            <pattern>%d %p %c{1.}: Line.%L [%t] %m%n</pattern>
+        </encoder>
+
+        <!-- 1.基于固定文件大小的RollingPolicy,会在固定编号文件间滚动-->
+        <!-- <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy"> -->
+            <!-- 需要SizeBasedTriggeringPolicy配合设置-->
+            <!-- <fileNamePattern>tmp/logs/app.%i.log</fileNamePattern> -->
+            <!-- <minIndex>1</minIndex> -->
+            <!-- <maxIndex>5</maxIndex> -->
+        <!-- </rollingPolicy> -->
+
+        <!-- <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy"> -->
+            <!-- 设置上面FixedWindowRollingPolicy文件滚动的阈值-->
+            <!-- <maxFileSize>5MB</maxFileSize> -->
+        <!-- </triggeringPolicy> -->
+        <!-- 1.end.基于固定文件大小的RollingPolicy,会在固定编号文件间滚动-->
+
+        <!-- 2.基于固定时间的RollingPolicy,会在固定时间生成新的日志输出-->
+        <!-- <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy"> -->
+            <!-- daily rollover -->
+            <!-- 基于时间的RollingPolicy会检测fileNamePattern中滚动的日期单位,下面的设置是以天为单位-->
+            <!-- <fileNamePattern>logFile.%d{yyyy-MM-dd}.log</fileNamePattern> -->
+            <!-- keep 7 days' worth of history capped at 30MB total size -->
+            <!-- 时间滚动的单位是天,所以基于时间7天滚动一次,新的日志会覆盖7天前的内容,7天内的日志在不超过totalSizeCap的前提下会保留-->
+            <!-- <maxHistory>7</maxHistory> -->
+            <!-- <totalSizeCap>30MB</totalSizeCap> -->
+            <!-- 新启动时会清空maxHistory之前的历史日志,否则一些程序由于运行时间短可能永远不会触发运行时间达到maxHistory时的滚动导致日志堆积-->
+            <!-- <cleanHistoryOnStart>true</cleanHistoryOnStart> -->
+        <!-- </rollingPolicy> -->
+        <!-- 2.end.基于固定时间的RollingPolicy,会在固定时间生成新的日志输出-->
+
+        <!-- 3.基于固定时间和文件大小的RollingPolicy,会在固定时间内,根据文件大小约束生成新的日志输出-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- 基于时间的RollingPolicy会检测fileNamePattern中滚动的日期单位,下面的设置是以天为单位-->
+            <fileNamePattern>tmp/logs/app-%d{yyyy-MM-dd}.%i.log</fileNamePattern>            
+            <!-- 单个文件大小为0.5MB-->
+            <maxFileSize>512KB</maxFileSize>
+            <!-- 时间滚动的单位是天,所以基于时间7天滚动一次,新的日志会覆盖7天前的内容,7天内的日志在不超过totalSizeCap的前提下会保留-->
+            <maxHistory>7</maxHistory>
+            <totalSizeCap>10MB</totalSizeCap>
+            <!-- 新启动时会清空maxHistory之前的历史日志,否则一些程序由于运行时间短可能永远不会触发运行时间达到maxHistory时的滚动导致日志堆积-->
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
+        <!-- 3.end.基于固定时间和文件大小的RollingPolicy,会在固定时间内,根据文件大小约束生成新的日志输出-->
+    </appender>
+
+    <!-- appender要挂到logger下,name设置包名,level设置最低输出级别,additivity默认是true-->
+    <!-- additivity是true时,被定义的包会同时被上级包绑定的appender影响,设置成false时不再会被上级包影响,-->
+    <!-- 由于下面的root是所有包的上级包,所以这里如果additivity设置成true,com.sdmap.core包下的日志会重复输出-->
+    <logger name="com.sdmap.core" level="debug" additivity="false">
+        <appender-ref ref="RollingFile" />
+    </logger>
+    <!-- appender要挂到logger下,root是必须设置的logger-->
+    <root level="INFO">
+        <appender-ref ref="Console" />
+        <appender-ref ref="RollingFile" />
+    </root>
+</configuration>
