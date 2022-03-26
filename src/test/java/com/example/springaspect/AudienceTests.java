@@ -1,6 +1,7 @@
 package com.example.springaspect;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,11 @@ public class AudienceTests {
     @Test
     public void pfShouldNotBeNull() {
         assertNotNull(performance);
+    }
+
+    @Test
+    public void pfShouldBeEncoreable() {
+        assertTrue(performance instanceof Encoreable);
     }
 
     @Test
