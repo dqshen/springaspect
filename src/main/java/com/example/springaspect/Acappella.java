@@ -7,22 +7,25 @@ import org.springframework.stereotype.Component;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Component
 public class Acappella implements Performance {
 
     private static final String WHO = "Actor: ";
 
-    @Override
-    public void perform() {
-        int result = new Random().nextInt(5);
-        if (result > 2) {
+    private static String name = "";
 
-        log.info(WHO + "Making some strange things on scene");
-            throw new IllegalArgumentException(WHO + "Actor falsified");
+    @Override
+    public void perform(boolean rst) {
+        boolean result = rst;
+        if (result) {
+            log.info(WHO + " " + name + " Building a chord");
+        } else {
+            log.info(WHO + " " + name + " Making some strange things on scene");
+            throw new IllegalArgumentException(WHO + " "+ name+" Actor falsified");
         }
-        else{
-            log.info(WHO + "Building a chord");
-        }
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
 }

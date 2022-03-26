@@ -22,4 +22,10 @@ public class ConcertConfig {
         return new EncoreableIntroducer();
     }
     
+    @Bean 
+    public Performance performance(){
+        Acappella performance = new Acappella();
+        performance.setName("Power");
+        return performance;
+    }
 }

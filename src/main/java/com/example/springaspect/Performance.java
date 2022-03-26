@@ -2,5 +2,5 @@ package com.example.springaspect;
 
 public interface Performance {
 
-    public void perform();
+    public void perform(boolean rst);
 }
