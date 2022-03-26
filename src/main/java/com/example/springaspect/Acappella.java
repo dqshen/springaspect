@@ -1,9 +1,5 @@
 package com.example.springaspect;
 
-import java.util.Random;
-
-import org.springframework.stereotype.Component;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -11,7 +7,7 @@ public class Acappella implements Performance {
 
     private static final String WHO = "Actor: ";
 
-    private static String name = "";
+    private String name = "";
 
     @Override
     public void perform(boolean rst) {
@@ -24,8 +20,8 @@ public class Acappella implements Performance {
         }
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setName(String performer) {
+        name = performer;
     }
 
 }
